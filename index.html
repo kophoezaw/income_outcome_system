@@ -29,32 +29,25 @@
 
     <!-- Authentication / Login Section -->
     <div id="auth-section">
-        <h3>ဖုန်းနံပါတ်ဖြင့် ဝင်ရောက်ရန်</h3>
+        <h3>အီးမေးလ်ဖြင့် ဝင်ရောက်ရန်</h3>
         <div class="form-group">
-            <label>ဖုန်းနံပါတ် (ဥပမာ - +959xxxxxxxx)</label>
-            <input type="text" id="phone-number" placeholder="+959...">
+            <label>အီးမေးလ် (Email)</label>
+            <input type="email" id="email" placeholder="example@email.com">
         </div>
-        <button id="send-otp-btn">OTP ပို့ရန်</button>
-        
-        <div id="otp-container" class="hidden" style="margin-top: 15px;">
-            <div class="form-group">
-                <label>OTP ကုဒ်ထည့်ရန်</label>
-                <input type="text" id="otp-code" placeholder="6 လုံးထည့်ပါ">
-            </div>
-            <button id="verify-otp-btn">အတည်ပြု Login ဝင်မည်</button>
+        <div class="form-group">
+            <label>စကားဝှက် (Password)</label>
+            <input type="password" id="password" placeholder="စကားဝှက်ထည့်ပါ">
         </div>
-        <div id="recaptcha-container"></div>
+        <button id="login-btn">အကောင့်ဝင်မည်</button>
     </div>
 
     <!-- Main App Section (Hidden until logged in and approved) -->
     <div id="app-section" class="hidden">
-        <!-- Tabs -->
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('income')">ဝင်ငွေ</button>
             <button class="tab-btn" onclick="switchTab('expense')">ထွက်ငွေ</button>
         </div>
 
-        <!-- Form -->
         <div class="form-group">
             <label id="label-amount">ငွေပမာဏ</label>
             <input type="number" id="amount" placeholder="ပမာဏထည့်ပါ">
@@ -65,7 +58,6 @@
         </div>
         <button id="save-btn" onclick="saveRecord()">သိမ်းဆည်းမည်</button>
 
-        <!-- Records Table -->
         <h3>စာရင်းများ</h3>
         <table>
             <thead>
@@ -91,8 +83,8 @@
 <!-- Firebase SDKs and Logic -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCzQq5qFDsrjGAVJ7DhxxhfNH-_mKp-Wus",
@@ -115,42 +107,27 @@
         event.target.classList.add('active');
     }
 
-    // Recaptcha Setup
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'invisible'
-    });
+    document.getElementById('login-btn').addEventListener('click', () => {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
 
-    document.getElementById('send-otp-btn').addEventListener('click', () => {
-        const phoneNumber = document.getElementById('phone-number').value;
-        const appVerifier = window.recaptchaVerifier;
-        signInWithPhoneNumber(auth, phoneNumber, appVerifier)
-            .then((confirmationResult) => {
-                window.confirmationResult = confirmationResult;
-                document.getElementById('otp-container').classList.remove('hidden');
-                alert('OTP ကို ပို့ပြီးပါပြီ။');
-            }).catch((error) => {
+        signInWithEmailAndPassword(auth, email, password)
+            .then(async (userCredential) => {
+                const user = userCredential.user;
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists() && userDoc.data().approved === true) {
+                    document.getElementById('auth-section').classList.add('hidden');
+                    document.getElementById('app-section').classList.remove('hidden');
+                    loadRecords();
+                } else {
+                    document.getElementById('auth-section').classList.add('hidden');
+                    document.getElementById('pending-section').classList.remove('hidden');
+                }
+            })
+            .catch((error) => {
                 console.error(error);
-                alert('OTP ပို့၍ မအောင်မြင်ပါ။ ဖုန်းနံပါတ်ကို စစ်ဆေးပါ။');
+                alert('အီးမေးလ် သို့မဟုတ် စကားဝှက် မှားယွင်းနေပါသည်။');
             });
-    });
-
-    document.getElementById('verify-otp-btn').addEventListener('click', () => {
-        const code = document.getElementById('otp-code').value;
-        window.confirmationResult.confirm(code).then(async (result) => {
-            const user = result.user;
-            // Check Admin Approval Status in Firestore 'users' collection
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            if (userDoc.exists() && userDoc.data().approved === true) {
-                document.getElementById('auth-section').classList.add('hidden');
-                document.getElementById('app-section').classList.remove('hidden');
-                loadRecords();
-            } else {
-                document.getElementById('auth-section').classList.add('hidden');
-                document.getElementById('pending-section').classList.remove('hidden');
-            }
-        }).catch((error) => {
-            alert('OTP ကုဒ် မှားယွင်းနေပါသည်။');
-        });
     });
 
     window.saveRecord = async function() {
