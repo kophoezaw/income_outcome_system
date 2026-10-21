@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ဝင်ငွေနှင့် ထွက်ငွေ စာရင်းစနစ်</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #444; }
+        .tabs { display: flex; justify-content: space-around; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+        .tab-btn { background: none; border: none; font-size: 16px; cursor: pointer; padding: 10px 20px; font-weight: bold; color: #666; }
+        .tab-btn.active { color: #007bff; border-bottom: 3px solid #007bff; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, button { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { background-color: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        button:hover { background-color: #0056b3; }
+        .hidden { display: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>ဝင်ငွေနှင့် ထွက်ငွေ စာရင်းစနစ်</h2>
+
+    <!-- Authentication / Login Section -->
+    <div id="auth-section">
+        <h3>ဖုန်းနံပါတ်ဖြင့် ဝင်ရောက်ရန်</h3>
+        <div class="form-group">
+            <label>ဖုန်းနံပါတ် (ဥပမာ - +959xxxxxxxx)</label>
+            <input type="text" id="phone-number" placeholder="+959...">
+        </div>
+        <button id="send-otp-btn">OTP ပို့ရန်</button>
+        
+        <div id="otp-container" class="hidden" style="margin-top: 15px;">
+            <div class="form-group">
+                <label>OTP ကုဒ်ထည့်ရန်</label>
+                <input type="text" id="otp-code" placeholder="6 လုံးထည့်ပါ">
+            </div>
+            <button id="verify-otp-btn">အတည်ပြု Login ဝင်မည်</button>
+        </div>
+        <div id="recaptcha-container"></div>
+    </div>
+
+    <!-- Main App Section (Hidden until logged in and approved) -->
+    <div id="app-section" class="hidden">
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('income')">ဝင်ငွေ</button>
+            <button class="tab-btn" onclick="switchTab('expense')">ထွက်ငွေ</button>
+        </div>
+
+        <!-- Form -->
+        <div class="form-group">
+            <label id="label-amount">ငွေပမာဏ</label>
+            <input type="number" id="amount" placeholder="ပမာဏထည့်ပါ">
+        </div>
+        <div class="form-group">
+            <label>ဖော်ပြချက် / အကြောင်းအရာ</label>
+            <input type="text" id="description" placeholder="အကြောင်းအရာရေးပါ">
+        </div>
+        <button id="save-btn" onclick="saveRecord()">သိမ်းဆည်းမည်</button>
+
+        <!-- Records Table -->
+        <h3>စာရင်းများ</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>အမျိုးအစား</th>
+                    <th>ပမာဏ</th>
+                    <th>အကြောင်းအရာ</th>
+                </tr>
+            </thead>
+            <tbody id="records-table-body">
+                <!-- Data will load here -->
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Pending Approval Notice -->
+    <div id="pending-section" class="hidden">
+        <h3 style="color: orange; text-align: center;">Admin ခွင့်ပြုချက် စောင့်ဆိုင်းနေပါသည်</h3>
+        <p style="text-align: center;">ကျေးဇူးပြု၍ Admin မှ သင့်အကောင့်ကို အတည်ပြုပေးသည်အထိ ခေတ္တစောင့်ဆိုင်းပါ။</p>
+    </div>
+</div>
+
+<!-- Firebase SDKs and Logic -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCzQq5qFDsrjGAVJ7DhxxhfNH-_mKp-Wus",
+        authDomain: "snf-donation-system.firebaseapp.com",
+        projectId: "snf-donation-system",
+        storageBucket: "snf-donation-system.firebasestorage.app",
+        messagingSenderId: "732142634860",
+        appId: "1:732142634860:web:1e6a812323d7a500099549",
+        measurementId: "G-FXP8XCKN05"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentTab = 'income';
+    window.switchTab = function(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    // Recaptcha Setup
+    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        'size': 'invisible'
+    });
+
+    document.getElementById('send-otp-btn').addEventListener('click', () => {
+        const phoneNumber = document.getElementById('phone-number').value;
+        const appVerifier = window.recaptchaVerifier;
+        signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+            .then((confirmationResult) => {
+                window.confirmationResult = confirmationResult;
+                document.getElementById('otp-container').classList.remove('hidden');
+                alert('OTP ကို ပို့ပြီးပါပြီ။');
+            }).catch((error) => {
+                console.error(error);
+                alert('OTP ပို့၍ မအောင်မြင်ပါ။ ဖုန်းနံပါတ်ကို စစ်ဆေးပါ။');
+            });
+    });
+
+    document.getElementById('verify-otp-btn').addEventListener('click', () => {
+        const code = document.getElementById('otp-code').value;
+        window.confirmationResult.confirm(code).then(async (result) => {
+            const user = result.user;
+            // Check Admin Approval Status in Firestore 'users' collection
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists() && userDoc.data().approved === true) {
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('app-section').classList.remove('hidden');
+                loadRecords();
+            } else {
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('pending-section').classList.remove('hidden');
+            }
+        }).catch((error) => {
+            alert('OTP ကုဒ် မှားယွင်းနေပါသည်။');
+        });
+    });
+
+    window.saveRecord = async function() {
+        const amount = document.getElementById('amount').value;
+        const description = document.getElementById('description').value;
+        if(!amount || !description) {
+            alert('အချက်အလက်များကို အပြည့်အစုံ ဖြည့်ပါ။');
+            return;
+        }
+        try {
+            await addDoc(collection(db, "records"), {
+                type: currentTab,
+                amount: parseFloat(amount),
+                description: description,
+                timestamp: new Date()
+            });
+            alert('အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။');
+            document.getElementById('amount').value = '';
+            document.getElementById('description').value = '';
+            loadRecords();
+        } catch (e) {
+            console.error(e);
+            alert('သိမ်းဆည်းရာတွင် အမှားအယွင်း ရှိသည်။');
+        }
+    }
+
+    async function loadRecords() {
+        const querySnapshot = await getDocs(collection(db, "records"));
+        const tbody = document.getElementById('records-table-body');
+        tbody.innerHTML = '';
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            tbody.innerHTML += `<tr>
+                <td>${data.type === 'income' ? 'ဝင်ငွေ' : 'ထွက်ငွေ'}</td>
+                <td>${data.amount}</td>
+                <td>${data.description}</td>
+            </tr>`;
+        });
+    }
+</script>
+
+</body>
+</html>
