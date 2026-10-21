@@ -3,206 +3,881 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ဝင်ငွေနှင့် ထွက်ငွေ စာရင်းစနစ်</title>
+    <title>အလှူလက်ခံခြင်း မှတ်တမ်းထိန်းသိမ်းခြင်း (SNF)</title>
+    <!-- Pyidaungsu & Padauk Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Pyidaungsu:wght@400;700&display=swap">
     <style>
-        body { font-family: sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #444; }
-        .tabs { display: flex; justify-content: space-around; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
-        .tab-btn { background: none; border: none; font-size: 16px; cursor: pointer; padding: 10px 20px; font-weight: bold; color: #666; }
-        .tab-btn.active { color: #007bff; border-bottom: 3px solid #007bff; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, select, button { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-        button { background-color: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        button:hover { background-color: #0056b3; }
-        .hidden { display: none; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }
-        th { background-color: #f2f2f2; }
-        .toggle-link { text-align: center; margin-top: 15px; color: #007bff; cursor: pointer; }
+        @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
+
+        :root {
+            --primary: #8b0000;
+            --primary-light: #a52a2a;
+            --gold: #c59b27;
+            --gold-dark: #a37f1e;
+            --gold-light: #fffdf5;
+            --bg: #f8f9fa;
+            --text: #2c3e50;
+            --border: #dee2e6;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Pyidaungsu', 'Padauk', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        /* Header Section */
+        .header-section {
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fffdf5;
+            margin-bottom: 25px;
+        }
+
+        .header-title-input {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            width: 100%;
+            border: none;
+            border-bottom: 2px dashed var(--gold);
+            background: transparent;
+            padding: 5px;
+            margin-bottom: 10px;
+            outline: none;
+        }
+
+        .header-subtitle-preview {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 15px;
+            padding: 6px;
+            background: #f0e6c8;
+            border-radius: 6px;
+        }
+
+        .header-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: #444;
+            font-size: 13px;
+        }
+
+        input[type="text"], 
+        input[type="number"], 
+        input[type="date"], 
+        textarea,
+        select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 60px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+        }
+
+        /* Form Card */
+        .donation-form-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-row-main {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .donations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 12px;
+            background: #fdfdfd;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #f0f0f0;
+            margin-bottom: 15px;
+        }
+
+        .donation-item-input {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .donation-item-input label {
+            font-size: 12px;
+            color: #444;
+        }
+
+        .donation-item-input input {
+            text-align: right;
+        }
+
+        .total-preview {
+            background-color: var(--gold-light);
+            border: 1px solid var(--gold);
+            padding: 12px 20px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 9px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-light); }
+        .btn-success { background: #2e7d32; color: white; }
+        .btn-success:hover { background: #1b5e20; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-secondary:hover { background: #5a6268; }
+        .btn-danger { background: #d32f2f; color: white; }
+        .btn-danger:hover { background: #b71c1c; }
+
+        /* Summary Bar */
+        .summary-filter-bar {
+            background: #f1f3f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+        }
+
+        .summary-card.uos { border-left-color: #1976d2; }
+        .summary-card.nna { border-left-color: #0288d1; }
+        .summary-card.cash { border-left-color: #388e3c; }
+
+        .summary-card div:first-child { font-size: 12px; color: #666; }
+        .summary-card div:last-child { font-size: 18px; font-weight: bold; color: #2c3e50; margin-top: 2px; }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+            background: white;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 9px 7px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: normal;
+            white-space: nowrap;
+        }
+
+        tbody tr:nth-child(even) { background-color: #fcfcfc; }
+        tbody tr:hover { background-color: #f5f5f5; }
+
+        .text-right { text-align: right; }
+        .action-btns { display: flex; gap: 4px; justify-content: center; }
+        .btn-sm { padding: 4px 8px; font-size: 12px; border-radius: 4px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>ဝင်ငွေနှင့် ထွက်ငွေ စာရင်းစနစ်</h2>
-
-    <!-- Authentication / Login & Signup Section -->
-    <div id="auth-section">
-        <h3 id="auth-title">အကောင့်ဝင်ရန်</h3>
-        <div class="form-group">
-            <label>အီးမေးလ် (Email)</label>
-            <input type="email" id="email" placeholder="example@email.com">
+    
+    <!-- Header Section for App Interface -->
+    <div class="header-section">
+        <input type="text" id="mainTitle" class="header-title-input" value="အလှူလက်ခံခြင်း မှတ်တမ်းထိန်းသိမ်းခြင်း" placeholder="ခေါင်းစဉ်ကြီး ရိုက်ထည့်ပါ">
+        <div class="header-subtitle-preview" id="headerSubtitlePreview">[ စာကြောင်းအချက်အလက် ပုံစံ ပရီဗျူး ]</div>
+        
+        <div class="header-grid">
+            <div class="form-group">
+                <label>အကြိမ်မြောက် (၃ ခု Drop-down)</label>
+                <div style="display:flex; gap:5px;">
+                    <select id="timesDigit1"></select>
+                    <select id="timesDigit2"></select>
+                    <select id="timesDigit3"></select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>စတင်သည့် ရက်စွဲ (မှ)</label>
+                <input type="date" id="headerStartDate">
+            </div>
+            <div class="form-group">
+                <label>ပြီးဆုံးသည့် ရက်စွဲ (ထိ)</label>
+                <input type="date" id="headerEndDate">
+            </div>
+            <div class="form-group">
+                <label>အကြောင်းအရာ</label>
+                <select id="headerCampType">
+                    <option value="ယောဂီသစ်လေ့ကျင့်ရေး">ယောဂီသစ်လေ့ကျင့်ရေး</option>
+                    <option value="ယောဂီဟောင်းစုပေါင်းတရားထိုင်ခြင်း">ယောဂီဟောင်းစုပေါင်းတရားထိုင်ခြင်း</option>
+                    <option value="ယောဂီသစ် စစ်ဆေးရေး">ယောဂီသစ် စစ်ဆေးရေး</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Level</label>
+                <select id="headerLevel">
+                    <option value="Level 1">Level 1</option>
+                    <option value="Level 2">Level 2</option>
+                    <option value="Level 3">Level 3</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>အမျိုးအစား (A, B, C, -)</label>
+                <select id="headerSubOption">
+                    <option value="-">- (မပါ)</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>နေရာ</label>
+                <select id="headerLocationSelect" onchange="toggleCustomLocation()">
+                    <option value="မြေနီကုန်းဓမ္မာရုံ">မြေနီကုန်းဓမ္မာရုံ</option>
+                    <option value="ဓမ္မရက္ခိတဓမ္မာရုံ">ဓမ္မရက္ခိတဓမ္မာရုံ</option>
+                    <option value="custom">အခြား</option>
+                </select>
+                <input type="text" id="headerCustomLocation" placeholder="နေရာ ရိုက်ထည့်ပါ" style="display:none; margin-top:5px;">
+            </div>
         </div>
-        <div class="form-group">
-            <label>စကားဝှက် (Password)</label>
-            <input type="password" id="password" placeholder="စကားဝှက်ထည့်ပါ (ቢያንስ ၆ လုံး)">
-        </div>
-        <button id="auth-btn">အကောင့်ဝင်မည်</button>
-        <div class="toggle-link" id="toggle-auth-mode">အကောင့်မရှိသေးပါက အကောင့်အသစ်လုပ်ရန် (Sign up)</div>
     </div>
 
-    <!-- Main App Section -->
-    <div id="app-section" class="hidden">
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('income')">ဝင်ငွေ</button>
-            <button class="tab-btn" onclick="switchTab('expense')">ထွက်ငွေ</button>
+    <!-- Data Input Form -->
+    <div class="donation-form-card">
+        <div class="section-title">
+            <span>အလှူငွေ စာရင်းအသစ် ထည့်သွင်းရန်</span>
+            <span id="formModeText" style="font-size:12px; font-weight:normal; color:#666;">[ အသစ်ထည့်သွင်းမှု ]</span>
         </div>
 
-        <div class="form-group">
-            <label id="label-amount">ငွေပမာဏ</label>
-            <input type="number" id="amount" placeholder="ပမာဏထည့်ပါ">
-        </div>
-        <div class="form-group">
-            <label>ဖော်ပြချက် / အကြောင်းအရာ</label>
-            <input type="text" id="description" placeholder="အကြောင်းအရာရေးပါ">
-        </div>
-        <button id="save-btn" onclick="saveRecord()">သိမ်းဆည်းမည်</button>
+        <input type="hidden" id="editIndex" value="-1">
 
-        <h3>စာရင်းများ</h3>
-        <table>
+        <div class="form-row-main">
+            <div class="form-group">
+                <label>ရက်စွဲ (Date) *</label>
+                <input type="date" id="entryDate" required>
+            </div>
+            <div class="form-group" style="grid-column: span 2;">
+                <label>အလှူရှင်အမည် / မိသားစုအမည်များ *</label>
+                <textarea id="entryName" placeholder="အလှူရှင်အမည်များနှင့် မိသားစု ရိုက်ထည့်ပါ..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label>YG No *</label>
+                <input type="text" id="entryYgNo" placeholder="YG နံပါတ်" required>
+            </div>
+            <div class="form-group">
+                <label>ပေးချေမှုပုံစံ (Payment) *</label>
+                <select id="entryPayment">
+                    <option value="UOS kpay">UOS kpay</option>
+                    <option value="NNA kpay">NNA kpay</option>
+                    <option value="Cash">Cash</option>
+                </select>
+            </div>
+        </div>
+
+        <label style="font-weight:bold; margin-bottom:8px; display:block; color:#444;">အလှူငွေ/စာရင်း ခွဲခြားထည့်သွင်းရန် (ကျပ်) -</label>
+        
+        <div class="donations-grid">
+            <div class="donation-item-input"><label>၁. အောင်လံဆရာတော်ဘုရားကြီး နဝကမ္မ</label><input type="number" class="d-amount" id="d1" placeholder="0" min="0" oninput="calculateCurrentSum()"></div>
+            <div class="donation-item-input"><label>၂. သာသနာ့ပျိုးဥယျာဉ်ကျောင်း</label><input type="number" class="d-amount" id="d2" placeholder="0" min="0" oninput="calculateCurrentSum()"></div>
+            <div class="donation-item-input"><label>၃. သာသနာ့ပျိုးဥယျာဉ်သိမ်တော်</label><input type="number" class="d-amount" id="d3" placeholder="0" min="0" oninput="calculateCurrentSum()"></div>
+            <div class="donation-item-input"><label>၄. Onsite တရားစခန်းပွဲ</label><input type="number" class="d-amount" id="d4" placeholder="0" min="0" oninput="calculateCurrentSum()"></div>
+            <div class="donation-item-input"><label>၅. ဆွမ်းပဒေသာပင်</label><input type="number" class="d-amount" id="d5" placeholder="0" min="0" oninput="calculateCurrentSum()"></div>
+            <div class="donation-item-input"><label>၆. Onsite တနေ့တာ နေ့ဆွမ်းအလှူ</label><input type="number" class="d-amount" id="d6" placeholder="800,000" min="0" oninput="calculateCurrentSum()"></div>
+            <div class="donation-item-input"><label>၇. Onsite တနေ့တာ နေ့အချိုပွဲအလှူ</label><input type="number" class="d-amount" id="d7" placeholder="200,000" min="0" oninput="calculateCurrentSum()"></div>
+            <div class="donation-item-input"><label>၈. Onsite တနေ့တာ ညနေ အအေး၊မုန့် အလှူ</label><input type="number" class="d-amount" id="d8" placeholder="300,000" min="0" oninput="calculateCurrentSum()"></div>
+            <div class="donation-item-input"><label>၉. Onsite တနေ့တာ ဓမ္မာရုံ အလှူ</label><input type="number" class="d-amount" id="d9" placeholder="100,000" min="0" oninput="calculateCurrentSum()"></div>
+            <div class="donation-item-input"><label>၁၀. တရားစာအုပ်နှင့် တရားစီဒီ</label><input type="number" class="d-amount" id="d10" placeholder="0" min="0" oninput="calculateCurrentSum()"></div>
+        </div>
+
+        <div class="total-preview">
+            <span>စုစုပေါင်း အလှူငွေ (Auto Sum):</span>
+            <span id="currentCalculatedTotal">0 ကျပ်</span>
+        </div>
+
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary" onclick="saveEntry()">💾 စာရင်းသိမ်းဆည်းမည်</button>
+            <button type="button" class="btn btn-secondary" onclick="resetForm()">🔄 Reset ရှင်းမည်</button>
+        </div>
+    </div>
+
+    <!-- Daily Filter & Summary -->
+    <div class="summary-filter-bar">
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <label style="font-weight:bold;">တနေ့စာ အနှစ်ချုပ် ကြည့်ရှုရန် ရက်စွဲ ရွေးပါ:</label>
+            <input type="date" id="filterDate" onchange="renderData()" style="width:auto;">
+            <button class="btn btn-secondary btn-sm" onclick="clearDateFilter()">ရက်စွဲအားလုံးကြည့်မည်</button>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-success" onclick="exportToCSV()">📊 Excel / CSV ထုတ်ယူမည်</button>
+            <button class="btn btn-danger" onclick="clearAllData()">🗑️ အချက်အလက်များအားလုံး ဖျက်မည် (Clear All)</button>
+        </div>
+
+        <div class="summary-cards">
+            <div class="summary-card"><div>ရွေးချယ်ထားသော ရက်စွဲ စုစုပေါင်း</div><div id="sumSelectedTotal">0 ကျပ်</div></div>
+            <div class="summary-card uos"><div>UOS kpay စုစုပေါင်း</div><div id="sumUosKpay">0 ကျပ်</div></div>
+            <div class="summary-card nna"><div>NNA kpay စုစုပေါင်း</div><div id="sumNnaKpay">0 ကျပ်</div></div>
+            <div class="summary-card cash"><div>Cash စုစုပေါင်း</div><div id="sumCash">0 ကျပ်</div></div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+        <table id="donationTable">
             <thead>
                 <tr>
-                    <th>အမျိုးအစား</th>
-                    <th>ပမာဏ</th>
-                    <th>အကြောင်းအရာ</th>
+                    <th>SN</th>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>YG No</th>
+                    <th>နဝကမ္မ</th>
+                    <th>ပျိုးကျောင်း</th>
+                    <th>သိမ်တော်</th>
+                    <th>တရားစခန်း</th>
+                    <th>ပဒေသာပင်</th>
+                    <th>နေ့ဆွမ်း</th>
+                    <th>နေ့အချိုပွဲ</th>
+                    <th>အအေး/မုန့်</th>
+                    <th>ဓမ္မာရုံ</th>
+                    <th>စာအုပ်/စီဒီ</th>
+                    <th>Amount (Sum)</th>
+                    <th>Payment</th>
+                    <th class="action-column">လုပ်ဆောင်ချက်များ</th>
                 </tr>
             </thead>
-            <tbody id="records-table-body">
-                <!-- Data will load here -->
-            </tbody>
+            <tbody id="tableBody"></tbody>
+            <tfoot>
+                <tr style="font-weight:bold; background-color:#f8f9fa;">
+                    <td colspan="4" class="text-right">စုစုပေါင်း ( Total ) :</td>
+                    <td id="tD1" class="text-right">0</td>
+                    <td id="tD2" class="text-right">0</td>
+                    <td id="tD3" class="text-right">0</td>
+                    <td id="tD4" class="text-right">0</td>
+                    <td id="tD5" class="text-right">0</td>
+                    <td id="tD6" class="text-right">0</td>
+                    <td id="tD7" class="text-right">0</td>
+                    <td id="tD8" class="text-right">0</td>
+                    <td id="tD9" class="text-right">0</td>
+                    <td id="tD10" class="text-right">0</td>
+                    <td id="tGrandTotal" class="text-right" style="color:var(--primary);">0</td>
+                    <td colspan="2"></td>
+                </tr>
+            </tfoot>
         </table>
     </div>
-    
-    <!-- Pending Approval Notice -->
-    <div id="pending-section" class="hidden">
-        <h3 style="color: orange; text-align: center;">Admin ခွင့်ပြုချက် စောင့်ဆိုင်းနေပါသည်</h3>
-        <p style="text-align: center;">ကျေးဇူးပြု၍ Admin မှ သင့်အကောင့်ကို အတည်ပြုပေးသည်အထိ ခေတ္တစောင့်ဆိုင်းပါ။</p>
-    </div>
+
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+<script>
+    let records = JSON.parse(localStorage.getItem('myanmar_donations_data')) || [];
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyCzQq5qFDsrjGAVJ7DhxxhfNH-_mKp-Wus",
-        authDomain: "snf-donation-system.firebaseapp.com",
-        projectId: "snf-donation-system",
-        storageBucket: "snf-donation-system.firebasestorage.app",
-        messagingSenderId: "732142634860",
-        appId: "1:732142634860:web:1e6a812323d7a500099549",
-        measurementId: "G-FXP8XCKN05"
-    };
+    document.addEventListener('DOMContentLoaded', () => {
+        populateTimesDropdowns();
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('entryDate').value = today;
+        document.getElementById('filterDate').value = today;
+        
+        loadHeaderState();
+        updatePlaceholders();
+        updateFullSubtitle();
+        renderData();
 
-    let isSignUp = false;
-
-    document.getElementById('toggle-auth-mode').addEventListener('click', () => {
-        isSignUp = !isSignUp;
-        const title = document.getElementById('auth-title');
-        const btn = document.getElementById('auth-btn');
-        const toggle = document.getElementById('toggle-auth-mode');
-
-        if (isSignUp) {
-            title.innerText = 'အကောင့်အသစ်လုပ်ရန် (Sign Up)';
-            btn.innerText = 'အကောင့်အသစ်ပြုလုပ်မည်';
-            toggle.innerText = 'အကောင့်ရှိပြီးသားဖြစ်ပါက အကောင့်ဝင်ရန် (Login)';
-        } else {
-            title.innerText = 'အကောင့်ဝင်ရန်';
-            btn.innerText = 'အကောင့်ဝင်မည်';
-            toggle.innerText = 'အကောင့်မရှိသေးပါက အကောင့်အသစ်လုပ်ရန် (Sign up)';
-        }
-    });
-
-    let currentTab = 'income';
-    window.switchTab = function(tab) {
-        currentTab = tab;
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-    }
-
-    document.getElementById('auth-btn').addEventListener('click', async () => {
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-
-        if (!email || !password) {
-            alert('အီးမေးလ်နှင့် စကားဝှက်ကို ထည့်ပါ။');
-            return;
-        }
-
-        try {
-            let userCredential;
-            if (isSignUp) {
-                userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                // Create pending user doc in Firestore automatically
-                await setDoc(doc(db, "users", userCredential.user.uid), {
-                    email: email,
-                    approved: false
+        ['mainTitle', 'timesDigit1', 'timesDigit2', 'timesDigit3', 'headerStartDate', 'headerEndDate', 'headerCampType', 'headerLevel', 'headerSubOption', 'headerLocationSelect', 'headerCustomLocation'].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) {
+                el.addEventListener('input', () => {
+                    saveHeaderState();
+                    updateFullSubtitle();
                 });
-                alert('အကောင့်ဖွင့်ခြင်း ပြီးဆုံးပါပြီ။ Admin အတည်ပြုချက် စောင့်ဆိုင်းပါ။');
-                document.getElementById('auth-section').classList.add('hidden');
-                document.getElementById('pending-section').classList.remove('hidden');
-            } else {
-                userCredential = await signInWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if (userDoc.exists() && userDoc.data().approved === true) {
-                    document.getElementById('auth-section').classList.add('hidden');
-                    document.getElementById('app-section').classList.remove('hidden');
-                    loadRecords();
-                } else {
-                    document.getElementById('auth-section').classList.add('hidden');
-                    document.getElementById('pending-section').classList.remove('hidden');
-                }
+                el.addEventListener('change', () => {
+                    saveHeaderState();
+                    updateFullSubtitle();
+                    if(id === 'headerLocationSelect') {
+                        updatePlaceholders();
+                    }
+                });
             }
-        } catch (error) {
-            console.error(error);
-            alert('အမှားအယွင်း ရှိနေပါသည်။ (စကားဝှက် အနည်းဆုံး ၆ လုံးရှိရပါမည်)');
-        }
+        });
     });
 
-    window.saveRecord = async function() {
-        const amount = document.getElementById('amount').value;
-        const description = document.getElementById('description').value;
-        if(!amount || !description) {
-            alert('အချက်အလက်များကို အပြည့်အစုံ ဖြည့်ပါ။');
-            return;
-        }
-        try {
-            await addDoc(collection(db, "records"), {
-                type: currentTab,
-                amount: parseFloat(amount),
-                description: description,
-                timestamp: new Date()
-            });
-            alert('အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။');
-            document.getElementById('amount').value = '';
-            document.getElementById('description').value = '';
-            loadRecords();
-        } catch (e) {
-            console.error(e);
-            alert('သိမ်းဆည်းရာတွင် အမှားအယွင်း ရှိသည်။');
+    function updatePlaceholders() {
+        const locationSel = document.getElementById('headerLocationSelect').value;
+        
+        document.getElementById('d6').placeholder = "800,000";
+        document.getElementById('d7').placeholder = "200,000";
+        document.getElementById('d8').placeholder = "300,000";
+
+        if (locationSel === 'မြေနီကုန်းဓမ္မာရုံ') {
+            document.getElementById('d9').placeholder = "100,000";
+        } else if (locationSel === 'ဓမ္မရက္ခိတဓမ္မာရုံ') {
+            document.getElementById('d9').placeholder = "200,000";
+        } else {
+            document.getElementById('d9').placeholder = "0";
         }
     }
 
-    async function loadRecords() {
-        const querySnapshot = await getDocs(collection(db, "records"));
-        const tbody = document.getElementById('records-table-body');
+    function toggleCustomLocation() {
+        const sel = document.getElementById('headerLocationSelect').value;
+        const customInput = document.getElementById('headerCustomLocation');
+        if (sel === 'custom') {
+            customInput.style.display = 'block';
+        } else {
+            customInput.style.display = 'none';
+        }
+        saveHeaderState();
+        updateFullSubtitle();
+    }
+
+    function populateTimesDropdowns() {
+        const d1 = document.getElementById('timesDigit1');
+        const d2 = document.getElementById('timesDigit2');
+        const d3 = document.getElementById('timesDigit3');
+        
+        d1.innerHTML = ''; d2.innerHTML = ''; d3.innerHTML = '';
+
+        for(let i=0; i<=9; i++) {
+            d1.innerHTML += `<option value="${i}">${i}</option>`;
+            d2.innerHTML += `<option value="${i}">${i}</option>`;
+            d3.innerHTML += `<option value="${i}">${i}</option>`;
+        }
+    }
+
+    function formatDateDisplay(dateStr) {
+        if(!dateStr) return '';
+        const parts = dateStr.split('-');
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
+    }
+
+    function generateHeaderSubtitle() {
+        let rawTimes = document.getElementById('timesDigit1').value + document.getElementById('timesDigit2').value + document.getElementById('timesDigit3').value;
+        let formattedTimes = parseInt(rawTimes, 10).toString();
+        
+        let level = document.getElementById('headerLevel').value;
+        let subOpt = document.getElementById('headerSubOption').value;
+        let levelFull = level + (subOpt !== '-' ? subOpt : '');
+        
+        let campType = document.getElementById('headerCampType').value;
+        
+        let startDate = formatDateDisplay(document.getElementById('headerStartDate').value);
+        let endDate = formatDateDisplay(document.getElementById('headerEndDate').value);
+        let dateRange = startDate;
+        if(endDate && endDate !== startDate) {
+            dateRange = `${startDate} _ ${endDate}`;
+        }
+        
+        let locSel = document.getElementById('headerLocationSelect').value;
+        let location = locSel === 'custom' ? (document.getElementById('headerCustomLocation').value || '') : locSel;
+
+        let strComponents = [];
+        if(formattedTimes) strComponents.push(`${formattedTimes} အကြိမ်မြောက်`);
+        if(levelFull) strComponents.push(levelFull);
+        if(campType) strComponents.push(campType);
+        if(dateRange) strComponents.push(dateRange);
+        if(location) strComponents.push(location);
+
+        return strComponents.join(' ');
+    }
+
+    function updateFullSubtitle() {
+        const subStr = generateHeaderSubtitle();
+        document.getElementById('headerSubtitlePreview').innerText = subStr ? subStr : '[ စာကြောင်းအချက်အလက် မရှိသေးပါ ]';
+    }
+
+    function saveHeaderState() {
+        const headerData = {
+            mainTitle: document.getElementById('mainTitle').value,
+            t1: document.getElementById('timesDigit1').value,
+            t2: document.getElementById('timesDigit2').value,
+            t3: document.getElementById('timesDigit3').value,
+            headerStartDate: document.getElementById('headerStartDate').value,
+            headerEndDate: document.getElementById('headerEndDate').value,
+            headerCampType: document.getElementById('headerCampType').value,
+            headerLevel: document.getElementById('headerLevel').value,
+            headerSubOption: document.getElementById('headerSubOption').value,
+            locationSelect: document.getElementById('headerLocationSelect').value,
+            customLocation: document.getElementById('headerCustomLocation').value
+        };
+        localStorage.setItem('myanmar_donations_header', JSON.stringify(headerData));
+    }
+
+    function loadHeaderState() {
+        const savedHeader = JSON.parse(localStorage.getItem('myanmar_donations_header'));
+        if (savedHeader) {
+            document.getElementById('mainTitle').value = savedHeader.mainTitle || 'အလှူလက်ခံခြင်း မှတ်တမ်းထိန်းသိမ်းခြင်း';
+            document.getElementById('timesDigit1').value = savedHeader.t1 || '0';
+            document.getElementById('timesDigit2').value = savedHeader.t2 || '6';
+            document.getElementById('timesDigit3').value = savedHeader.t3 || '9';
+            document.getElementById('headerStartDate').value = savedHeader.headerStartDate || '';
+            document.getElementById('headerEndDate').value = savedHeader.headerEndDate || '';
+            document.getElementById('headerCampType').value = savedHeader.headerCampType || 'ယောဂီသစ်လေ့ကျင့်ရေး';
+            document.getElementById('headerLevel').value = savedHeader.headerLevel || 'Level 1';
+            document.getElementById('headerSubOption').value = savedHeader.headerSubOption || 'A';
+            document.getElementById('headerLocationSelect').value = savedHeader.locationSelect || 'မြေနီကုန်းဓမ္မာရုံ';
+            document.getElementById('headerCustomLocation').value = savedHeader.customLocation || '';
+            toggleCustomLocation();
+        }
+    }
+
+    function calculateCurrentSum() {
+        let sum = 0;
+        for(let i = 1; i <= 10; i++) {
+            sum += parseFloat(document.getElementById(`d${i}`).value) || 0;
+        }
+        document.getElementById('currentCalculatedTotal').innerText = sum.toLocaleString() + ' ကျပ်';
+        return sum;
+    }
+
+    function saveEntry() {
+        const date = document.getElementById('entryDate').value;
+        const name = document.getElementById('entryName').value.trim();
+        const ygNo = document.getElementById('entryYgNo').value.trim();
+        const payment = document.getElementById('entryPayment').value;
+        const editIndex = parseInt(document.getElementById('editIndex').value);
+
+        if (!date || !name || !ygNo) {
+            alert('ကျေးဇူးပြု၍ ရက်စွဲ၊ အမည် နှင့် YG နံပါတ် တို့ကို ဖြည့်သွင်းပေးပါ။');
+            return;
+        }
+
+        let donations = [];
+        let totalAmount = 0;
+        for (let i = 1; i <= 10; i++) {
+            let amt = parseFloat(document.getElementById(`d${i}`).value) || 0;
+            donations.push(amt);
+            totalAmount += amt;
+        }
+
+        const recordItem = { date, name, ygNo, payment, donations, totalAmount };
+
+        if (editIndex === -1) {
+            records.push(recordItem);
+        } else {
+            records[editIndex] = recordItem;
+        }
+
+        saveRecords();
+        resetForm();
+        renderData();
+    }
+
+    function resetForm() {
+        document.getElementById('entryName').value = '';
+        document.getElementById('entryYgNo').value = '';
+        document.getElementById('entryPayment').value = 'UOS kpay';
+        document.getElementById('editIndex').value = '-1';
+        document.getElementById('formModeText').innerText = '[ အသစ်ထည့်သွင်းမှု ]';
+        
+        for (let i = 1; i <= 10; i++) {
+            document.getElementById(`d${i}`).value = '';
+        }
+        
+        calculateCurrentSum();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function saveRecords() {
+        localStorage.setItem('myanmar_donations_data', JSON.stringify(records));
+    }
+
+    function renderData() {
+        const tbody = document.getElementById('tableBody');
+        const filterDate = document.getElementById('filterDate').value;
         tbody.innerHTML = '';
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            tbody.innerHTML += `<tr>
-                <td>${data.type === 'income' ? 'ဝင်ငွေ' : 'ထွက်ငွေ'}</td>
-                <td>${data.amount}</td>
-                <td>${data.description}</td>
-            </tr>`;
+
+        let totals = new Array(10).fill(0);
+        let grandTotal = 0, selectedTotal = 0, uosKpayTotal = 0, nnaKpayTotal = 0, cashTotal = 0;
+        let displayIndex = 1;
+
+        records.forEach((rec, originalIndex) => {
+            if (filterDate && rec.date !== filterDate) return;
+
+            // Handle legacy records that only had 9 items
+            if(rec.donations.length < 10) {
+                while(rec.donations.length < 10) rec.donations.push(0);
+            }
+
+            rec.donations.forEach((amt, idx) => totals[idx] += amt);
+            grandTotal += rec.totalAmount;
+            selectedTotal += rec.totalAmount;
+
+            let pType = rec.payment;
+            if(pType === 'Kpay1') pType = 'UOS kpay';
+            if(pType === 'Kpay2') pType = 'NNA kpay';
+
+            if (pType === 'UOS kpay') uosKpayTotal += rec.totalAmount;
+            if (pType === 'NNA kpay') nnaKpayTotal += rec.totalAmount;
+            if (pType === 'Cash') cashTotal += rec.totalAmount;
+
+            const formattedDate = formatDateDisplay(rec.date);
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${displayIndex++}</td>
+                <td>${formattedDate}</td>
+                <td style="text-align:left; white-space:pre-wrap;">${escapeHtml(rec.name)}</td>
+                <td>${escapeHtml(rec.ygNo)}</td>
+                <td class="text-right">${rec.donations[0].toLocaleString()}</td>
+                <td class="text-right">${rec.donations[1].toLocaleString()}</td>
+                <td class="text-right">${rec.donations[2].toLocaleString()}</td>
+                <td class="text-right">${rec.donations[3].toLocaleString()}</td>
+                <td class="text-right">${rec.donations[4].toLocaleString()}</td>
+                <td class="text-right">${rec.donations[5].toLocaleString()}</td>
+                <td class="text-right">${rec.donations[6].toLocaleString()}</td>
+                <td class="text-right">${rec.donations[7].toLocaleString()}</td>
+                <td class="text-right">${rec.donations[8].toLocaleString()}</td>
+                <td class="text-right">${rec.donations[9].toLocaleString()}</td>
+                <td class="text-right" style="font-weight:bold;">${rec.totalAmount.toLocaleString()}</td>
+                <td>${pType}</td>
+                <td class="action-column">
+                    <div class="action-btns">
+                        <button class="btn btn-secondary btn-sm" onclick="editRecord(${originalIndex})">✏️</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteRecord(${originalIndex})">🗑️</button>
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
         });
+
+        document.getElementById('sumSelectedTotal').innerText = selectedTotal.toLocaleString() + ' ကျပ်';
+        document.getElementById('sumUosKpay').innerText = uosKpayTotal.toLocaleString() + ' ကျပ်';
+        document.getElementById('sumNnaKpay').innerText = nnaKpayTotal.toLocaleString() + ' ကျပ်';
+        document.getElementById('sumCash').innerText = cashTotal.toLocaleString() + ' ကျပ်';
+
+        for (let i = 0; i < 10; i++) document.getElementById(`tD${i+1}`).innerText = totals[i].toLocaleString();
+        document.getElementById('tGrandTotal').innerText = grandTotal.toLocaleString();
+    }
+
+    function editRecord(index) {
+        const rec = records[index];
+        document.getElementById('entryDate').value = rec.date;
+        document.getElementById('entryName').value = rec.name;
+        document.getElementById('entryYgNo').value = rec.ygNo;
+
+        let pType = rec.payment;
+        if(pType === 'Kpay1') pType = 'UOS kpay';
+        if(pType === 'Kpay2') pType = 'NNA kpay';
+        document.getElementById('entryPayment').value = pType;
+
+        document.getElementById('editIndex').value = index;
+        document.getElementById('formModeText').innerText = `[ ပြင်ဆင်နေသည် - SN ${index + 1} ]`;
+
+        if(rec.donations.length < 10) {
+            while(rec.donations.length < 10) rec.donations.push(0);
+        }
+
+        rec.donations.forEach((amt, i) => {
+            document.getElementById(`d${i+1}`).value = amt > 0 ? amt : '';
+        });
+
+        calculateCurrentSum();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function deleteRecord(index) {
+        if (confirm('ဤစာရင်းကို ဖျက်ရန် သေချာပါသလား?')) {
+            records.splice(index, 1);
+            saveRecords();
+            renderData();
+        }
+    }
+
+    function clearDateFilter() {
+        document.getElementById('filterDate').value = '';
+        renderData();
+    }
+
+    function clearAllData() {
+        if (confirm('အချက်အလက်များ အားလုံးကို ဖျက်ပစ်ရန် သေချာပါသလား?')) {
+            records = [];
+            saveRecords();
+            renderData();
+            resetForm();
+        }
+    }
+
+    function escapeHtml(text) {
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function exportToCSV() {
+        const filterDate = document.getElementById('filterDate').value;
+        const filteredRecords = records.filter(rec => !filterDate || rec.date === filterDate);
+
+        if(filteredRecords.length === 0) {
+            alert('ထုတ်ယူရန် စာရင်းအချက်အလက် မရှိပါ။');
+            return;
+        }
+
+        const mainTitle = document.getElementById('mainTitle').value;
+        const subTitle = generateHeaderSubtitle();
+
+        let totals = new Array(10).fill(0);
+        let grandTotal = 0;
+
+        let csvContent = "\uFEFF";
+        csvContent += `"${mainTitle.replace(/"/g, '""')}"\n`;
+        if(subTitle) {
+            csvContent += `"${subTitle.replace(/"/g, '""')}"\n`;
+        }
+        csvContent += "\n";
+        csvContent += "SN,Date,Name,YG No,အောင်လံဆရာတော်ဘုရားကြီး နဝကမ္မ,သာသနာ့ပျိုးဥယျာဉ်ကျောင်း,သာသနာ့ပျိုးဥယျာဉ်သိမ်တော်,Onsite တရားစခန်းပွဲ,ဆွမ်းပဒေသာပင်,Onsite တနေ့တာ နေ့ဆွမ်းအလှူ,Onsite တနေ့တာ နေ့အချိုပွဲအလှူ,Onsite တနေ့တာ ညနေ အအေးမုန့် အလှူ,Onsite တနေ့တာ ဓမ္မာရုံ အလှူ,တရားစာအုပ်နှင့် တရားစီဒီ,Total Amount,Payment\n";
+
+        filteredRecords.forEach((rec, idx) => {
+            const formattedDate = formatDateDisplay(rec.date);
+            
+            if(rec.donations.length < 10) {
+                while(rec.donations.length < 10) rec.donations.push(0);
+            }
+
+            rec.donations.forEach((amt, i) => totals[i] += amt);
+            grandTotal += rec.totalAmount;
+
+            let pType = rec.payment;
+            if(pType === 'Kpay1') pType = 'UOS kpay';
+            if(pType === 'Kpay2') pType = 'NNA kpay';
+
+            let row = [
+                idx + 1,
+                `"${formattedDate}"`,
+                `"${rec.name.replace(/"/g, '""')}"`,
+                `"${rec.ygNo.replace(/"/g, '""')}"`,
+                ...rec.donations,
+                rec.totalAmount,
+                `"${pType}"`
+            ];
+            csvContent += row.join(",") + "\n";
+        });
+
+        // AUTO SUM TOTAL ROW FOR EXCEL
+        let totalRow = [
+            '""',
+            '""',
+            '"စုစုပေါင်း ( Total )"',
+            '""',
+            ...totals,
+            grandTotal,
+            '""'
+        ];
+        csvContent += totalRow.join(",") + "\n";
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `Donation_Report_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 </script>
 
