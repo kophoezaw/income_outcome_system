@@ -20,6 +20,7 @@
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 14px; }
         th { background-color: #f2f2f2; }
+        .toggle-link { text-align: center; margin-top: 15px; color: #007bff; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -27,21 +28,22 @@
 <div class="container">
     <h2>ဝင်ငွေနှင့် ထွက်ငွေ စာရင်းစနစ်</h2>
 
-    <!-- Authentication / Login Section -->
+    <!-- Authentication / Login & Signup Section -->
     <div id="auth-section">
-        <h3>အီးမေးလ်ဖြင့် ဝင်ရောက်ရန်</h3>
+        <h3 id="auth-title">အကောင့်ဝင်ရန်</h3>
         <div class="form-group">
             <label>အီးမေးလ် (Email)</label>
             <input type="email" id="email" placeholder="example@email.com">
         </div>
         <div class="form-group">
             <label>စကားဝှက် (Password)</label>
-            <input type="password" id="password" placeholder="စကားဝှက်ထည့်ပါ">
+            <input type="password" id="password" placeholder="စကားဝှက်ထည့်ပါ (ቢያንስ ၆ လုံး)">
         </div>
-        <button id="login-btn">အကောင့်ဝင်မည်</button>
+        <button id="auth-btn">အကောင့်ဝင်မည်</button>
+        <div class="toggle-link" id="toggle-auth-mode">အကောင့်မရှိသေးပါက အကောင့်အသစ်လုပ်ရန် (Sign up)</div>
     </div>
 
-    <!-- Main App Section (Hidden until logged in and approved) -->
+    <!-- Main App Section -->
     <div id="app-section" class="hidden">
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('income')">ဝင်ငွေ</button>
@@ -80,11 +82,10 @@
     </div>
 </div>
 
-<!-- Firebase SDKs and Logic -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyCzQq5qFDsrjGAVJ7DhxxhfNH-_mKp-Wus",
@@ -100,6 +101,25 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    let isSignUp = false;
+
+    document.getElementById('toggle-auth-mode').addEventListener('click', () => {
+        isSignUp = !isSignUp;
+        const title = document.getElementById('auth-title');
+        const btn = document.getElementById('auth-btn');
+        const toggle = document.getElementById('toggle-auth-mode');
+
+        if (isSignUp) {
+            title.innerText = 'အကောင့်အသစ်လုပ်ရန် (Sign Up)';
+            btn.innerText = 'အကောင့်အသစ်ပြုလုပ်မည်';
+            toggle.innerText = 'အကောင့်ရှိပြီးသားဖြစ်ပါက အကောင့်ဝင်ရန် (Login)';
+        } else {
+            title.innerText = 'အကောင့်ဝင်ရန်';
+            btn.innerText = 'အကောင့်ဝင်မည်';
+            toggle.innerText = 'အကောင့်မရှိသေးပါက အကောင့်အသစ်လုပ်ရန် (Sign up)';
+        }
+    });
+
     let currentTab = 'income';
     window.switchTab = function(tab) {
         currentTab = tab;
@@ -107,12 +127,29 @@
         event.target.classList.add('active');
     }
 
-    document.getElementById('login-btn').addEventListener('click', () => {
+    document.getElementById('auth-btn').addEventListener('click', async () => {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
 
-        signInWithEmailAndPassword(auth, email, password)
-            .then(async (userCredential) => {
+        if (!email || !password) {
+            alert('အီးမေးလ်နှင့် စကားဝှက်ကို ထည့်ပါ။');
+            return;
+        }
+
+        try {
+            let userCredential;
+            if (isSignUp) {
+                userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                // Create pending user doc in Firestore automatically
+                await setDoc(doc(db, "users", userCredential.user.uid), {
+                    email: email,
+                    approved: false
+                });
+                alert('အကောင့်ဖွင့်ခြင်း ပြီးဆုံးပါပြီ။ Admin အတည်ပြုချက် စောင့်ဆိုင်းပါ။');
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('pending-section').classList.remove('hidden');
+            } else {
+                userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 if (userDoc.exists() && userDoc.data().approved === true) {
@@ -123,11 +160,11 @@
                     document.getElementById('auth-section').classList.add('hidden');
                     document.getElementById('pending-section').classList.remove('hidden');
                 }
-            })
-            .catch((error) => {
-                console.error(error);
-                alert('အီးမေးလ် သို့မဟုတ် စကားဝှက် မှားယွင်းနေပါသည်။');
-            });
+            }
+        } catch (error) {
+            console.error(error);
+            alert('အမှားအယွင်း ရှိနေပါသည်။ (စကားဝှက် အနည်းဆုံး ၆ လုံးရှိရပါမည်)');
+        }
     });
 
     window.saveRecord = async function() {
